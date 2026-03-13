@@ -21,31 +21,6 @@ let currentPeriod = 7;
 const POPULAR = ['USD', 'KRW', 'EUR', 'JPY', 'GBP', 'CNY', 'CAD', 'AUD', 'CHF', 'HKD'];
 
 // ── Currencies ──────────────────────────────────────────────────────────────
-async function loadCurrencies() {
-  const res = await fetch(`${API}/currencies`);
-  const data = await res.json();
-
-  // Sort: popular first, then alphabetical
-  const all = Object.entries(data); // [[code, name], ...]
-  const popular = POPULAR.filter(c => data[c]).map(c => [c, data[c]]);
-  const rest = all.filter(([c]) => !POPULAR.includes(c)).sort((a, b) => a[0].localeCompare(b[0]));
-  const sorted = [...popular, ...rest];
-
-  [fromCurrencyEl, toCurrencyEl].forEach((sel, idx) => {
-    sorted.forEach(([code, name]) => {
-      const opt = document.createElement('option');
-      opt.value = code;
-      opt.textContent = `${code} — ${name}`;
-      sel.appendChild(opt);
-    });
-  });
-
-  fromCurrencyEl.value = 'USD';
-  toCurrencyEl.value = 'KRW';
-
-  convert();
-  loadChart();
-}
 
 // ── Conversion ───────────────────────────────────────────────────────────────
 async function convert() {
@@ -258,6 +233,111 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
+// ── Compare ──────────────────────────────────────────────────────────────────
+const compareCurrencyEl = document.getElementById('compare-currency');
+const compareAmountEl = document.getElementById('compare-amount');
+const compareSearchEl = document.getElementById('compare-search');
+const compareGrid = document.getElementById('compare-grid');
+
+let allRates = {};
+let allCurrencyNames = {};
+
+async function loadCompare() {
+  const from = compareCurrencyEl.value;
+  if (!from) return;
+
+  compareGrid.innerHTML = '<div class="chart-overlay" style="position:static;background:none;padding:2rem;">불러오는 중...</div>';
+
+  try {
+    const res = await fetch(`${API}/latest?from=${from}`);
+    const data = await res.json();
+    allRates = data.rates;
+    allRates[from] = 1;
+    renderCompareGrid();
+  } catch {
+    compareGrid.innerHTML = '<div class="chart-overlay" style="position:static;background:none;padding:2rem;">데이터를 불러올 수 없습니다.</div>';
+  }
+}
+
+function renderCompareGrid() {
+  const amount = parseFloat(compareAmountEl.value) || 1;
+  const search = compareSearchEl.value.trim().toLowerCase();
+  const from = compareCurrencyEl.value;
+
+  const entries = Object.entries(allRates)
+    .filter(([code]) => {
+      if (!search) return true;
+      const name = (allCurrencyNames[code] || '').toLowerCase();
+      return code.toLowerCase().includes(search) || name.includes(search);
+    })
+    .sort(([a], [b]) => {
+      const ai = POPULAR.indexOf(a);
+      const bi = POPULAR.indexOf(b);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+  compareGrid.innerHTML = '';
+
+  entries.forEach(([code, rate]) => {
+    const value = (amount * rate).toLocaleString('ko-KR', { maximumFractionDigits: 4 });
+    const name = allCurrencyNames[code] || '';
+    const isPopular = POPULAR.includes(code);
+    const isSelf = code === from;
+
+    const div = document.createElement('div');
+    div.className = `compare-item${isPopular ? ' popular' : ''}`;
+    div.innerHTML = `
+      <div class="compare-code">${code}${isSelf ? ' ★' : ''}</div>
+      <div class="compare-name">${name}</div>
+      <div class="compare-value">${value}</div>
+    `;
+    div.addEventListener('click', () => {
+      fromCurrencyEl.value = from;
+      toCurrencyEl.value = code;
+      fromAmountEl.value = compareAmountEl.value;
+      convert();
+      loadChart();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    compareGrid.appendChild(div);
+  });
+}
+
 // ── Init ─────────────────────────────────────────────────────────────────────
-loadCurrencies();
-renderFavorites();
+async function init() {
+  const res = await fetch(`${API}/currencies`);
+  const data = await res.json();
+  allCurrencyNames = data;
+
+  const all = Object.entries(data);
+  const popular = POPULAR.filter(c => data[c]).map(c => [c, data[c]]);
+  const rest = all.filter(([c]) => !POPULAR.includes(c)).sort((a, b) => a[0].localeCompare(b[0]));
+  const sorted = [...popular, ...rest];
+
+  [fromCurrencyEl, toCurrencyEl, compareCurrencyEl].forEach(sel => {
+    sorted.forEach(([code, name]) => {
+      const opt = document.createElement('option');
+      opt.value = code;
+      opt.textContent = `${code} — ${name}`;
+      sel.appendChild(opt);
+    });
+  });
+
+  fromCurrencyEl.value = 'USD';
+  toCurrencyEl.value = 'KRW';
+  compareCurrencyEl.value = 'USD';
+
+  convert();
+  loadChart();
+  loadCompare();
+  renderFavorites();
+}
+
+compareCurrencyEl.addEventListener('change', loadCompare);
+compareAmountEl.addEventListener('input', renderCompareGrid);
+compareSearchEl.addEventListener('input', renderCompareGrid);
+
+init();

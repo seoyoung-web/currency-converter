@@ -295,6 +295,129 @@ header h1 {
   color: #e53e3e;
 }
 
+/* Compare Card */
+.compare-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-top: 1.5rem;
+}
+
+.compare-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.compare-header h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.compare-controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.compare-base {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.compare-base select {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #f7fafc;
+  cursor: pointer;
+  outline: none;
+}
+
+.compare-base select:focus {
+  border-color: #4299e1;
+}
+
+.compare-base input[type="number"] {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 110px;
+  outline: none;
+}
+
+.compare-base input[type="number"]:focus {
+  border-color: #4299e1;
+}
+
+.compare-search {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  width: 160px;
+}
+
+.compare-search:focus {
+  border-color: #4299e1;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.compare-item {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.compare-item:hover {
+  border-color: #90cdf4;
+  background: #ebf8ff;
+}
+
+.compare-item.popular {
+  border-color: #bee3f8;
+  background: #f0f8ff;
+}
+
+.compare-code {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.compare-name {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2b6cb0;
+  margin-top: 0.5rem;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .converter-row {

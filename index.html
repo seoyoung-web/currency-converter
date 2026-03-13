@@ -61,6 +61,23 @@
     </div>
   </div>
 
+  <!-- 다중 통화 비교 -->
+  <section class="compare-card">
+    <div class="compare-header">
+      <h2>다중 통화 비교</h2>
+      <div class="compare-controls">
+        <div class="compare-base">
+          <select id="compare-currency"></select>
+          <input type="number" id="compare-amount" value="1" min="0" step="any" />
+        </div>
+        <input type="text" id="compare-search" placeholder="통화 검색..." class="compare-search" />
+      </div>
+    </div>
+    <div id="compare-grid" class="compare-grid">
+      <div class="chart-overlay">불러오는 중...</div>
+    </div>
+  </section>
+
   <script src="app.js"></script>
 </body>
 </html>
